@@ -171,12 +171,23 @@ func ShowServer(w http.ResponseWriter, r *http.Request) {
   }
 }
 
+func UsrpointServer(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, "usrpoint\n")
+  r.ParseForm()
+  u,_:=strconv.Atoi(r.FormValue("usr"))
+  fmt.Println(p[u]["x"])
+  fmt.Println(p[u]["y"])
+  fmt.Fprintf(w,"%d ",p[u]["y"])
+  fmt.Fprintf(w,"%d",p[u]["x"])
+}
+
 func main() {
     // http.HandleFuncにルーティングと処理する関数を登録
     http.HandleFunc("/start", StartServer)
     http.HandleFunc("/move", MoveServer)
     http.HandleFunc("/remove", RemoveServer)
     http.HandleFunc("/show", ShowServer)
+    http.HandleFunc("/usrpoint", UsrpointServer)
 
     // ログ出力
     log.Printf("Start Go HTTP Server")
