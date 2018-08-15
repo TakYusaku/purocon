@@ -109,13 +109,43 @@ func MoveServer(w http.ResponseWriter, r *http.Request) {
     fmt.Println(r.FormValue("d"))
     //d:=r.FormValue("d")
     d:=strings.Split(r.FormValue("d"), "")
-    if u==1||u==2 {user[p[u]["x"]][p[u]["y"]]=5
-    }else{user[p[u]["x"]][p[u]["y"]]=6}
+    /*
     for i:=0; i<len(d); i++{
       if d[i]=="r"{p[u]["y"]++
       }else if d[i]=="l"{p[u]["y"]--
       }else if d[i]=="u"{p[u]["x"]--
       }else if d[i]=="d"{p[u]["x"]++}
+    }
+    */
+    tmp_px:=p[u]["x"]
+    tmp_py:=p[u]["y"]
+    for i:=0; i<len(d); i++{
+      if d[i]=="r"{tmp_py++
+      }else if d[i]=="l"{tmp_py--
+      }else if d[i]=="u"{tmp_px--
+      }else if d[i]=="d"{tmp_px++}
+    }
+    if 0<=tmp_px && tmp_px<length && 0<=tmp_py && tmp_py<width {
+      if u==1||u==2 {
+        if user[tmp_px][tmp_py]==0 || user[tmp_px][tmp_py]==5 {
+          user[p[u]["x"]][p[u]["y"]]=5
+        }else{
+          fmt.Fprintf(w,"Error \n")
+          return
+        }
+      }else{
+        if user[tmp_px][tmp_py]==0 || user[tmp_px][tmp_py]==6 {
+          user[p[u]["x"]][p[u]["y"]]=6
+        }else{
+          fmt.Fprintf(w,"Error \n")
+          return
+        }
+      }
+      p[u]["x"]=tmp_px
+      p[u]["y"]=tmp_py
+    }else{
+      fmt.Fprintf(w,"Error \n")
+      return
     }
     user[p[u]["x"]][p[u]["y"]]=u
     pcount[u]++
@@ -144,7 +174,12 @@ func RemoveServer(w http.ResponseWriter, r *http.Request) {
     }else if d[i]=="u"{tmp_px--
     }else if d[i]=="d"{tmp_px++}
   }
-  if user[tmp_px][tmp_py]!=1&&user[tmp_px][tmp_py]!=2&&user[tmp_px][tmp_py]!=3&&user[tmp_px][tmp_py]!=4 {user[tmp_px][tmp_py]=0}
+  if 0<=tmp_px && tmp_px<length && 0<=tmp_py && tmp_py<width {
+    if user[tmp_px][tmp_py]!=1&&user[tmp_px][tmp_py]!=2&&user[tmp_px][tmp_py]!=3&&user[tmp_px][tmp_py]!=4 {user[tmp_px][tmp_py]=0}
+  }else{
+    fmt.Fprintf(w,"Error \n")
+    return
+  }
 
   pcount[u]++
   if(pcount[1]==pcount[2]&&pcount[2]==pcount[3]&&pcount[3]==pcount[4]){
