@@ -101,7 +101,7 @@ func StartServer(w http.ResponseWriter, r *http.Request) {
 }
 
 func MoveServer(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "move\n")
+    // fmt.Fprintf(w, "move\n") yusaku
     r.ParseForm()
     //curl -X POST localhost:8000/move -d "usr=1&d=right"
     u,_:=strconv.Atoi(r.FormValue("usr"))
@@ -130,21 +130,21 @@ func MoveServer(w http.ResponseWriter, r *http.Request) {
         if user[tmp_px][tmp_py]==0 || user[tmp_px][tmp_py]==5 {
           user[p[u]["x"]][p[u]["y"]]=5
         }else{
-          fmt.Fprintf(w,"Error \n")
+          fmt.Fprintf(w,"is_panel \n")  // ;;;
           return
         }
       }else{
         if user[tmp_px][tmp_py]==0 || user[tmp_px][tmp_py]==6 {
           user[p[u]["x"]][p[u]["y"]]=6
         }else{
-          fmt.Fprintf(w,"Error \n")
+          fmt.Fprintf(w,"is_panel \n")  // ;;;
           return
         }
       }
       p[u]["x"]=tmp_px
       p[u]["y"]=tmp_py
-    }else{
-      fmt.Fprintf(w,"Error \n")
+    }else{  // out of field
+      fmt.Fprintf(w,"Error \n")  // ;;;
       return
     }
     user[p[u]["x"]][p[u]["y"]]=u
@@ -159,7 +159,7 @@ func MoveServer(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemoveServer(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "remove\n")
+  // fmt.Fprintf(w, "remove\n") yusaku
   r.ParseForm()
   //curl -X POST localhost:8000/move -d "usr=1&d=right"
   u,_:=strconv.Atoi(r.FormValue("usr"))
@@ -207,13 +207,66 @@ func ShowServer(w http.ResponseWriter, r *http.Request) {
 }
 
 func UsrpointServer(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "usrpoint\n")
+  // fmt.Fprintf(w, "usrpoint\n") yusaku
   r.ParseForm()
   u,_:=strconv.Atoi(r.FormValue("usr"))
   fmt.Println(p[u]["x"])
   fmt.Println(p[u]["y"])
   fmt.Fprintf(w,"%d ",p[u]["y"])
   fmt.Fprintf(w,"%d",p[u]["x"])
+}
+
+func JudgeServer(w http.ResponseWriter, r *http.Request) { // ;;;
+    // fmt.Fprintf(w, "move\n") yusak
+    // curl -X POST localhost:8000/judgedirection -d "usr=1&d=r"
+    r.ParseForm()
+    //curl -X POST localhost:8000/move -d "usr=1&d=right"
+    u,_:=strconv.Atoi(r.FormValue("usr"))
+    fmt.Println(u)
+    fmt.Println(r.FormValue("d"))
+    //d:=r.FormValue("d")
+    d:=strings.Split(r.FormValue("d"), "")
+
+    tmp_px:=p[u]["x"]
+    tmp_py:=p[u]["y"]
+    for i:=0; i<len(d); i++{
+      if d[i]=="r"{tmp_py++
+      }else if d[i]=="l"{tmp_py--
+      }else if d[i]=="u"{tmp_px--
+      }else if d[i]=="d"{tmp_px++}
+    }
+    if 0<=tmp_px && tmp_px<length && 0<=tmp_py && tmp_py<width {
+      if u==1||u==2 {
+        fmt.Fprintf(w,"%d ",tmp_py)  // ;;;
+        fmt.Fprintf(w,"%d",tmp_px)  // ;;;
+        fmt.Fprintf(w,"\n") // ;;;
+        if user[tmp_px][tmp_py]==0 || user[tmp_px][tmp_py]==5 {
+          fmt.Fprintf(w,"OK \n")
+        }else{
+          fmt.Fprintf(w,"is_panel \n")  // ;;;
+          return
+        }
+      }else{
+        fmt.Fprintf(w,"%d ",tmp_py)  // ;;;
+        fmt.Fprintf(w,"%d",tmp_px)  // ;;;
+        fmt.Fprintf(w,"\n")  // ;;;
+        if user[tmp_px][tmp_py]==0 || user[tmp_px][tmp_py]==6 {
+          fmt.Fprintf(w,"OK \n")
+        }else{
+          fmt.Fprintf(w,"is_panel \n")  // ;;;
+          return
+        }
+      }
+      // p[u]["x"]=tmp_px
+      // p[u]["y"]=tmp_py
+    }else{  // out of field
+      fmt.Fprintf(w,"%d ",p[u]["y"])  // ;;;
+      fmt.Fprintf(w,"%d",p[u]["x"])  // ;;;
+      fmt.Fprintf(w,"\n") // ;;;
+      fmt.Fprintf(w,"Error \n")  // ;;;
+      return
+    }
+    // user[p[u]["x"]][p[u]["y"]]=u
 }
 
 func main() {
@@ -223,6 +276,7 @@ func main() {
     http.HandleFunc("/remove", RemoveServer)
     http.HandleFunc("/show", ShowServer)
     http.HandleFunc("/usrpoint", UsrpointServer)
+    http.HandleFunc("/judgedirection", JudgeServer)
 
     // ログ出力
     log.Printf("Start Go HTTP Server")
